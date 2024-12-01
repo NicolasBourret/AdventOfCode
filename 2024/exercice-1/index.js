@@ -4,11 +4,13 @@ const locationIds = input.match(/\d+/g);
 
 // PART 1
 const initialValue = { left: [], right: [] };
+
+const addCurrentValue = (array) => (value) => array.push(value);
 const testreducedList = locationIds.reduce(
   (accumulator, currentValue, currentId) => {
     currentId % 2
-      ? accumulator.right.push(currentValue)
-      : accumulator.left.push(currentValue);
+      ? addCurrentValue(accumulator.right)(currentValue)
+      : addCurrentValue(accumulator.left)(currentValue);
     return accumulator;
   },
   initialValue
@@ -22,6 +24,8 @@ const distance = sortedRightList.reduce(
     Math.abs(sortedLefttList[currentId] - currentValue) + accumulator,
   0
 );
+
+console.log(distance);
 
 // PART 2
 const similariryScores = testreducedList.left.map((locationId) => {
