@@ -39,7 +39,7 @@ const elementIsSafe = (array, start, end) => {
   const [a, b, c] = slicedArray.map(convertInNumber);
   //   console.log(a, b, c);
   return (
-    ((isBetween(a, b) && isBetween(b, c)) || isBetween(a, c)) &&
+    ((isBetween(a, b) || isBetween(b, c)) || isBetween(a, c)) &&
     (isIncrease(a, b, c) || isDecrease(a, b, c))
   );
 };
