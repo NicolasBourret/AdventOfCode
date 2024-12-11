@@ -63,7 +63,7 @@ const checkReport = (acc, report) => {
           unsafe: [
             ...acc.unsafe,
             levelsArray
-              .slice(firstIncreaseUnsafe + 1, firstIncreaseUnsafe + 2)
+              .slice(firstIncreaseUnsafe, firstIncreaseUnsafe + 1)
               .join(" "),
           ],
         }
@@ -72,7 +72,7 @@ const checkReport = (acc, report) => {
           unsafe: [
             ...acc.unsafe,
             levelsArray
-              .slice(firstDecreaseUnsafe + 1, firstIncreaseUnsafe + 2)
+              .slice(firstDecreaseUnsafe, firstIncreaseUnsafe + 1)
               .join(" "),
           ],
         };
