@@ -11,108 +11,97 @@ import { input } from "./input.js";
 const trimValue = (value) => value.trim();
 const convertInArray = (value, expression) => value.split(expression);
 const convertInNumber = (value) => Number(value);
-const isBetween = (a, b) => Math.abs(a - b) >= 1 && Math.abs(a - b) <= 3;
-// const isIncrease = (a, b, c) => a < b && b < c;
-const isIncrease = (a, b) => a < b;
-// const isDecrease = (a, b, c) => a > b && b > c;
-const isDecrease = (a, b) => a > b;
 const convertInputInArray = (input) => {
   const trimedInput = trimValue(input);
   const inputToArray = convertInArray(trimedInput, /\n/g);
-
   return inputToArray;
 };
 
-// const elementIsSafe = (array, start, end) => {
-//   const slicedArray = array.slice(start, end);
-//   const [a, b, c] = slicedArray.map(convertInNumber);
-//   return (
-//     isBetween(a, b) &&
-//     isBetween(b, c) &&
-//     (isIncrease(a, b, c) || isDecrease(a, b, c))
-//   );
-// };
-
-// 459 > reponse > 395
-const elementIsSafe = (array, start, end) => {
-  const slicedArray = array.slice(start, end);
-  const [a, b, c] = slicedArray.map(convertInNumber);
-  //   console.log(a, b, c);
-  return (
-    (isBetween(a, b) || isBetween(b, c) || isBetween(a, c)) &&
-    (isIncrease(a, b, c) || isDecrease(a, b, c))
-  );
-};
-
-const checkReport = (report) => {
+const checkReport = (acc, report) => {
   const levelsArray = convertInArray(report, " ").map(convertInNumber);
-
-  // PART 1
-
-  /**
-   * 7, 6, 4, 2, 1
-   * 7 est safe car:
-   *  1 <= 7 - 6 <= 3 et 7 > 6 > 4
-   *
-   * 6 est safe car:
-   *  7 > 6 > 4 et 1 <= 7 - 6 <= 3 et 1 <= 6 - 4 <= 3
-   *
-   * 4 est safe car:
-   *  6 > 4 > 2 et 1 <= 6 - 4 <= 3 et 1 <= 4 - 2 <= 3
-   *
-   * 2 est safe car:
-   *  4 > 2 > 1 et 1 <= 4 - 2 <= 3 et 1 <= 2 - 1 <= 3
-   *
-   * 1 est safe car:
-   *  1 <= 2 - 1 <= 3 et 4 > 2 > 1
-   */
-  const inspectedLevels = levelsArray.reduce((acc, value, i) => {
-    if (i === 0) {
-      const a = value;
-      const b = levelsArray[i + 1];
-      const c = levelsArray[i + 2];
-      const safe =
-        ((isIncrease(a, b) && isIncrease(b, c)) ||
-          (isDecrease(a, b) && isDecrease(b, c))) &&
-        isBetween(a, b);
-
-      return [...acc, safe ? "safe" : "unsafe"];
-    }
-
+  const formattedLevels = levelsArray.map((level, i) => {
     if (i === levelsArray.length - 1) {
-      const a = levelsArray[i - 2];
-      const b = levelsArray[i - 1];
-      const c = value;
-      const safe =
-        ((isIncrease(a, b) && isIncrease(b, c)) ||
-          (isDecrease(a, b) && isDecrease(b, c))) &&
-        isBetween(b, c);
-
-      return [...acc, safe ? "safe" : "unsafe"];
+      return levelsArray[i - 1] - level;
     }
+    return level - levelsArray[i + 1];
+  });
+  const isSafeDecrease = formattedLevels.map((formattedLevel) => {
+    if (formattedLevel >= 1 && formattedLevel <= 3 && formattedLevel !== 0) {
+      return "safe";
+    }
+    return "unsafe";
+  });
+  const isSafeIncrease = formattedLevels.map((formattedLevel, i) => {
+    if (formattedLevel <= -1 && formattedLevel >= -3 && formattedLevel !== 0) {
+      return "safe";
+    }
+    return "unsafe";
+  });
 
-    const a = levelsArray[i - 1];
-    const b = value;
-    const c = levelsArray[i + 1];
-    const safe =
-      ((isIncrease(a, b) && isIncrease(b, c)) ||
-        (isDecrease(a, b) && isDecrease(b, c))) &&
-      isBetween(b, c) &&
-      isBetween(a, b);
+  console.log(isSafeIncrease);
+  // const isUnsafe =
+  //   (isSafeDecrease.includes("safe") && isSafeDecrease.includes("unsafe")) ||
+  //   (isSafeIncrease.includes("unsafe") && isSafeIncrease.includes("safe"));
 
-    return [...acc, safe ? "safe" : "unsafe"];
-  }, []);
+  const isSafe =
+    (!isSafeDecrease.includes("safe") && !isSafeIncrease.includes("unsafe")) ||
+    (!isSafeDecrease.includes("unsafe") && !isSafeIncrease.includes("safe"));
 
-  return inspectedLevels.includes("unsafe") ? "unsafe" : "safe";
+  if (!isSafe) {
+    const firstIncreaseUnsafe = isSafeIncrease.indexOf("unsafe");
+    const firstDecreaseUnsafe = isSafeDecrease.indexOf("unsafe");
+    return firstIncreaseUnsafe < firstIncreaseUnsafe
+      ? { ...acc, unsafe: [...acc.unsafe, report.slice(firstIncreaseUnsafe)] }
+      : {
+          ...acc,
+          unsafe: [...acc.unsafe, report.slice(firstDecreaseUnsafe)],
+        };
+  }
+
+  // if (!isSafe) {
+  //   const isUnsafeDecrease =
+  //     isSafeDecrease.filter((level) => level === "unsafe").length === 1;
+  //   const isUnsafeIncrease =
+  //     isSafeIncrease.filter((level) => level === "unsafe").length === 1;
+  //   const unsafeIndex = isSafeDecrease.indexOf("unsafe");
+  //   // const checkFirst = levelsArray[unsafeIndex + 1] - levelsArray[unsafeIndex + 2]
+  //   const diff = levelsArray[unsafeIndex - 1] - levelsArray[unsafeIndex + 1];
+
+  //   // 12 10 7 8 4 [ 'safe', 'safe', 'unsafe', 'unsafe', 'unsafe' ] [ 'unsafe', 'unsafe', 'safe', 'unsafe', 'unsafe' ]
+  //   if (
+  //     (isUnsafeDecrease || isUnsafeIncrease) &&
+  //     ((diff >= 1 && diff <= 3) || !diff)
+  //   ) {
+  //     // console.log(report, isSafeDecrease, isSafeIncrease);
+  //     return "safe";
+  //   }
+
+  //   console.log(report, isSafeDecrease, isSafeIncrease);
+  //   return "unsafe";
+  // }
+
+  // si que un unsafe dans le tableau, on check si a et c sont dans la fourchette
+
+  // console.log(isSafeDecrease, isSafeIncrease);
+
+  return isSafe
+    ? { ...acc, safe: [...acc.safe, report] }
+    : { ...acc, unsafe: [...acc.unsafe] };
 };
 
 const findSafeReports = (input) => {
   const arrayInput = convertInputInArray(input);
-  const checkedReports = arrayInput.map(checkReport);
-  const safeReports = checkedReports.filter((report) => report === "safe");
+  const { safe, unsafe } = arrayInput.reduce(checkReport, {
+    safe: [],
+    unsafe: [],
+  });
+  const becameSafe = unsafe.reduce(checkReport, {
+    safe: [],
+    unsafe: [],
+  });
 
-  console.log(safeReports.length);
-  return safeReports.length;
+  // console.log(unsafe);
+  return becameSafe;
 };
 
 findSafeReports(input);
