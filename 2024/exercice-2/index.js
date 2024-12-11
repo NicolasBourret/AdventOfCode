@@ -38,7 +38,7 @@ const checkReport = (acc, report) => {
     return "unsafe";
   });
 
-  console.log(isSafeIncrease);
+  // console.log(isSafeIncrease);
   // const isUnsafe =
   //   (isSafeDecrease.includes("safe") && isSafeDecrease.includes("unsafe")) ||
   //   (isSafeIncrease.includes("unsafe") && isSafeIncrease.includes("safe"));
@@ -50,11 +50,21 @@ const checkReport = (acc, report) => {
   if (!isSafe) {
     const firstIncreaseUnsafe = isSafeIncrease.indexOf("unsafe");
     const firstDecreaseUnsafe = isSafeDecrease.indexOf("unsafe");
-    return firstIncreaseUnsafe < firstIncreaseUnsafe
-      ? { ...acc, unsafe: [...acc.unsafe, report.slice(firstIncreaseUnsafe)] }
+
+    return firstIncreaseUnsafe < firstDecreaseUnsafe
+      ? {
+          ...acc,
+          unsafe: [
+            ...acc.unsafe,
+            levelsArray.slice(firstIncreaseUnsafe).join(" "),
+          ],
+        }
       : {
           ...acc,
-          unsafe: [...acc.unsafe, report.slice(firstDecreaseUnsafe)],
+          unsafe: [
+            ...acc.unsafe,
+            levelsArray.slice(firstDecreaseUnsafe).join(" "),
+          ],
         };
   }
 
@@ -84,9 +94,7 @@ const checkReport = (acc, report) => {
 
   // console.log(isSafeDecrease, isSafeIncrease);
 
-  return isSafe
-    ? { ...acc, safe: [...acc.safe, report] }
-    : { ...acc, unsafe: [...acc.unsafe] };
+  return { ...acc, safe: [...acc.safe, report] };
 };
 
 const findSafeReports = (input) => {
@@ -101,7 +109,7 @@ const findSafeReports = (input) => {
   });
 
   // console.log(unsafe);
-  return becameSafe;
+  // return becameSafe.safe.length;
 };
 
-findSafeReports(input);
+console.log(findSafeReports(input));
